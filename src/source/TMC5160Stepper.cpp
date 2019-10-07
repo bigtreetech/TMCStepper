@@ -1,17 +1,16 @@
 #include "TMCStepper.h"
 #include "TMC_MACROS.h"
 
-TMC5160Stepper::TMC5160Stepper(uint16_t pinCS, float RS) : TMC5130Stepper(pinCS, RS)
+TMC5160Stepper::TMC5160Stepper(uint16_t pinCS, float RS, int8_t link) : TMC5130Stepper(pinCS, RS, link)
   { defaults(); }
-TMC5160Stepper::TMC5160Stepper(uint16_t pinCS, float RS, uint16_t pinMOSI, uint16_t pinMISO, uint16_t pinSCK) :
-  TMC5130Stepper(pinCS, RS, pinMOSI, pinMISO, pinSCK)
+TMC5160Stepper::TMC5160Stepper(uint16_t pinCS, float RS, uint16_t pinMOSI, uint16_t pinMISO, uint16_t pinSCK, int8_t link) :
+  TMC5130Stepper(pinCS, RS, pinMOSI, pinMISO, pinSCK, link)
   { defaults(); }
-TMC5160Stepper::TMC5160Stepper(uint16_t pinCS, uint16_t pinMOSI, uint16_t pinMISO, uint16_t pinSCK) :
-  TMC5130Stepper(pinCS, default_RS, pinMOSI, pinMISO, pinSCK)
+TMC5160Stepper::TMC5160Stepper(uint16_t pinCS, uint16_t pinMOSI, uint16_t pinMISO, uint16_t pinSCK, int8_t link) :
+  TMC5130Stepper(pinCS, default_RS, pinMOSI, pinMISO, pinSCK, link)
   { defaults(); }
 
 void TMC5160Stepper::defaults() {
-  PWMCONF_register.sr = 0x00050480;
   SHORT_CONF_register.s2vs_level = 6;
   SHORT_CONF_register.s2g_level = 6;
   SHORT_CONF_register.shortfilter = 0b01;

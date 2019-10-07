@@ -1,13 +1,13 @@
 #include "TMCStepper.h"
 #include "TMC_MACROS.h"
 
-TMC2160Stepper::TMC2160Stepper(uint16_t pinCS, float RS) : TMC2130Stepper(pinCS, RS)
+TMC2160Stepper::TMC2160Stepper(uint16_t pinCS, float RS, int8_t link) : TMC2130Stepper(pinCS, RS, link)
   { defaults(); }
-TMC2160Stepper::TMC2160Stepper(uint16_t pinCS, float RS, uint16_t pinMOSI, uint16_t pinMISO, uint16_t pinSCK) :
-  TMC2130Stepper(pinCS, RS, pinMOSI, pinMISO, pinSCK)
+TMC2160Stepper::TMC2160Stepper(uint16_t pinCS, float RS, uint16_t pinMOSI, uint16_t pinMISO, uint16_t pinSCK, int8_t link) :
+  TMC2130Stepper(pinCS, RS, pinMOSI, pinMISO, pinSCK, link)
   { defaults(); }
-TMC2160Stepper::TMC2160Stepper(uint16_t pinCS, uint16_t pinMOSI, uint16_t pinMISO, uint16_t pinSCK) :
-  TMC2130Stepper(pinCS, default_RS, pinMOSI, pinMISO, pinSCK)
+TMC2160Stepper::TMC2160Stepper(uint16_t pinCS, uint16_t pinMOSI, uint16_t pinMISO, uint16_t pinSCK, int8_t link) :
+  TMC2130Stepper(pinCS, default_RS, pinMOSI, pinMISO, pinSCK, link)
   { defaults(); }
 
 void TMC2160Stepper::begin() {
@@ -28,7 +28,6 @@ void TMC2160Stepper::begin() {
 }
 
 void TMC2160Stepper::defaults() {
-  PWMCONF_register.sr = 0x00050480;
   SHORT_CONF_register.s2vs_level = 6;
   SHORT_CONF_register.s2g_level = 6;
   SHORT_CONF_register.shortfilter = 0b01;

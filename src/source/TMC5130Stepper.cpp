@@ -1,13 +1,13 @@
 #include "TMCStepper.h"
 #include "TMC_MACROS.h"
 
-TMC5130Stepper::TMC5130Stepper(uint16_t pinCS, float RS) : TMC2160Stepper(pinCS, RS)
+TMC5130Stepper::TMC5130Stepper(uint16_t pinCS, float RS, int8_t link) : TMC2160Stepper(pinCS, RS, link)
   { defaults(); }
-TMC5130Stepper::TMC5130Stepper(uint16_t pinCS, float RS, uint16_t pinMOSI, uint16_t pinMISO, uint16_t pinSCK) :
-  TMC2160Stepper(pinCS, RS, pinMOSI, pinMISO, pinSCK)
+TMC5130Stepper::TMC5130Stepper(uint16_t pinCS, float RS, uint16_t pinMOSI, uint16_t pinMISO, uint16_t pinSCK, int8_t link):
+  TMC2160Stepper(pinCS, RS, pinMOSI, pinMISO, pinSCK, link)
   { defaults(); }
-TMC5130Stepper::TMC5130Stepper(uint16_t pinCS, uint16_t pinMOSI, uint16_t pinMISO, uint16_t pinSCK) :
-  TMC2160Stepper(pinCS, default_RS, pinMOSI, pinMISO, pinSCK)
+TMC5130Stepper::TMC5130Stepper(uint16_t pinCS, uint16_t pinMOSI, uint16_t pinMISO, uint16_t pinSCK, int8_t link) :
+  TMC2160Stepper(pinCS, default_RS, pinMOSI, pinMISO, pinSCK, link)
   { defaults(); }
 
 void TMC5130Stepper::begin() {
@@ -210,8 +210,8 @@ void TMC5130Stepper::X_ENC(int32_t input) {
 }
 ///////////////////////////////////////////////////////////////////////////////////////
 // W: ENC_CONST
-uint16_t TMC5130Stepper::ENC_CONST() { return ENC_CONST_register.sr; }
-void TMC5130Stepper::ENC_CONST(uint16_t input) {
+uint32_t TMC5130Stepper::ENC_CONST() { return ENC_CONST_register.sr; }
+void TMC5130Stepper::ENC_CONST(uint32_t input) {
   ENC_CONST_register.sr = input;
   write(ENC_CONST_register.address, ENC_CONST_register.sr);
 }

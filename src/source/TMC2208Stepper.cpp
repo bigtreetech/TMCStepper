@@ -1,8 +1,25 @@
 #include "TMCStepper.h"
 #include "TMC_MACROS.h"
 
+#ifdef TMC_SERIAL_SWITCH
+  #include "SERIAL_SWITCH.h"
+#endif
+
 // Protected
 // addr needed for TMC2209
+#ifdef TMC_SERIAL_SWITCH
+  TMC2208Stepper::TMC2208Stepper(Stream * SerialPort, float RS, uint8_t addr, uint16_t mul_pin1, uint16_t mul_pin2) :
+  	TMCStepper(RS),
+  	slave_address(TMC2208_SLAVE_ADDR),
+  	write_only(false)
+  	{
+  	  SSwitch *SMulObj = new SSwitch(mul_pin1,mul_pin2,addr);
+  	  sswitch = SMulObj;
+  		HWSerial = SerialPort;
+  		defaults();
+  	}
+#endif
+
 TMC2208Stepper::TMC2208Stepper(Stream * SerialPort, float RS, uint8_t addr) :
 	TMCStepper(RS),
 	slave_address(addr),
@@ -57,7 +74,6 @@ void TMC2208Stepper::defaults() {
   //MSLUT6_register.sr = ???;
   //MSLUT7_register.sr = ???;
   //MSLUTSTART_register.start_sin90 = 247;
-  PWMCONF_register.sr = 0x00050480;
 }
 
 void TMC2208Stepper::push() {
@@ -105,7 +121,10 @@ void TMC2208Stepper::write(uint8_t addr, uint32_t regVal) {
 		} else
 	#endif
 		{
-			for(int i=0; i<=len; i++){
+		  #ifdef TMC_SERIAL_SWITCH
+		    sswitch->active();
+		  #endif
+			for(int i=0; i<=len; i++){			
 				bytesWritten += HWSerial->write(datagram[i]);
 		}
 	}
@@ -183,6 +202,9 @@ uint32_t TMC2208Stepper::read(uint8_t addr) {
 			} else
 		#endif
 			{
+			  #ifdef TMC_SERIAL_SWITCH
+		      sswitch->active();
+		    #endif
 				out = _sendDatagram(*HWSerial, datagram, len, abort_window);
 			}
 
@@ -252,8 +274,7 @@ uint8_t TMC2224Stepper::version() 	{ TMC2224_n::IOIN_t r{0}; r.sr = IOIN(); retu
 
 uint16_t TMC2208Stepper::FACTORY_CONF() {
 	if (write_only) return FACTORY_CONF_register.sr;
-	FACTORY_CONF_register.sr = read(FACTORY_CONF_register.address);
-	return FACTORY_CONF_register.sr;
+	return read(FACTORY_CONF_register.address);
 }
 void TMC2208Stepper::FACTORY_CONF(uint16_t input) {
 	FACTORY_CONF_register.sr = input;
@@ -261,8 +282,8 @@ void TMC2208Stepper::FACTORY_CONF(uint16_t input) {
 }
 void TMC2208Stepper::fclktrim(uint8_t B){ FACTORY_CONF_register.fclktrim = B; write(FACTORY_CONF_register.address, FACTORY_CONF_register.sr); }
 void TMC2208Stepper::ottrim(uint8_t B)	{ FACTORY_CONF_register.ottrim = B; write(FACTORY_CONF_register.address, FACTORY_CONF_register.sr); }
-uint8_t TMC2208Stepper::fclktrim()		{ read(FACTORY_CONF_register.address); return FACTORY_CONF_register.fclktrim; }
-uint8_t TMC2208Stepper::ottrim()		{ read(FACTORY_CONF_register.address); return FACTORY_CONF_register.ottrim; }
+uint8_t TMC2208Stepper::fclktrim()		{ FACTORY_CONF_t r{0}; r.sr = FACTORY_CONF(); return r.fclktrim; }
+uint8_t TMC2208Stepper::ottrim()		{ FACTORY_CONF_t r{0}; r.sr = FACTORY_CONF(); return r.ottrim; }
 
 void TMC2208Stepper::VACTUAL(uint32_t input) {
 	VACTUAL_register.sr = input;
